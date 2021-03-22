@@ -13,25 +13,27 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -59,7 +61,7 @@ public class ShowImagesActivity extends AppCompatActivity implements LoaderManag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_images);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Intent intent=getIntent();
@@ -71,7 +73,7 @@ public class ShowImagesActivity extends AppCompatActivity implements LoaderManag
         getSupportActionBar().setSubtitle(imageCount+"");
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,7 +87,7 @@ public class ShowImagesActivity extends AppCompatActivity implements LoaderManag
             getWindow().setStatusBarColor(color-10);
         }
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color));
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setBackgroundTintList(ColorStateList.valueOf(color+10));
 
         checkAllPermissions();
@@ -96,8 +98,8 @@ public class ShowImagesActivity extends AppCompatActivity implements LoaderManag
         if(!myDir.exists())  myDir.mkdirs();
 
         myDataProvider=new MyDataProvider(this);
-        tabLayout= (TabLayout) findViewById(R.id.tabLayout);
-        viewPager= (ViewPager) findViewById(R.id.viewPager);
+        tabLayout= findViewById(R.id.tabLayout);
+        viewPager= findViewById(R.id.viewPager);
         FragmentManager fragmentManager=getSupportFragmentManager();
         viewPager.setAdapter(new MyViewPagerAdapter(fragmentManager));
         tabLayout.setBackgroundColor(color);
@@ -128,31 +130,31 @@ public class ShowImagesActivity extends AppCompatActivity implements LoaderManag
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==CAMERA_REQUEST&&resultCode==RESULT_OK) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
 
-            ContentValues contentValues=new ContentValues();
+            ContentValues contentValues = new ContentValues();
             contentValues.put(MyDatabaseHelper.CATEGORY_NAME, categoryName);
             contentValues.put(MyDatabaseHelper.IMAGE_NAME, imageName);
             contentValues.put(MyDatabaseHelper.IMAGE_FILE, imageFile.getPath());
             myDataProvider.insert(MyDataProvider.TAGS_CONTENT_URI, contentValues);
 
-            ContentValues countContentValues=new ContentValues();
+            ContentValues countContentValues = new ContentValues();
             countContentValues.put(MyDatabaseHelper.CATEGORY_NAME, categoryName);
-            Cursor tempCursor= myDataProvider.query(MyDataProvider.CATEGORY_CONTENT_URI, null, MyDatabaseHelper.CATEGORY_NAME+" = ?",
-                    new String[] {categoryName}, null);
+            Cursor tempCursor = myDataProvider.query(MyDataProvider.CATEGORY_CONTENT_URI, null, MyDatabaseHelper.CATEGORY_NAME + " = ?",
+                    new String[]{categoryName}, null);
             tempCursor.moveToFirst();
-            countContentValues.put(MyDatabaseHelper.IMAGE_COUNT, tempCursor.getInt(tempCursor.getColumnIndex(MyDatabaseHelper.IMAGE_COUNT))+1);
-            myDataProvider.update(MyDataProvider.CATEGORY_CONTENT_URI, countContentValues, MyDatabaseHelper.CATEGORY_NAME+" = ?",
-                    new String[] {categoryName});
+            countContentValues.put(MyDatabaseHelper.IMAGE_COUNT, tempCursor.getInt(tempCursor.getColumnIndex(MyDatabaseHelper.IMAGE_COUNT)) + 1);
+            myDataProvider.update(MyDataProvider.CATEGORY_CONTENT_URI, countContentValues, MyDatabaseHelper.CATEGORY_NAME + " = ?",
+                    new String[]{categoryName});
 
             getSupportLoaderManager().restartLoader(TAG_LOADER, null, ShowImagesActivity.this);
 
-            Intent intent =new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(imageFile),"image/*");
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(imageFile), "image/*");
             startActivity(intent);
-        }
-        else {
-            Toast.makeText(this, imageName+" could not be saved ", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, imageName + " could not be saved ", Toast.LENGTH_SHORT).show();
         }
     }
 
