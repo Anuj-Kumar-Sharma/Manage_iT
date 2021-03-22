@@ -3,15 +3,16 @@ package com.example.anujsharma.manageit;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
@@ -93,14 +94,14 @@ public class MyViewAdapter extends SelectableAdapter<MyViewAdapter.MyViewHolder>
 
         public MyViewHolder(View itemView, ClickListener listener) {
             super(itemView);
-            categoryTextView = (TextView) itemView.findViewById(R.id.categoryNameView);
+            categoryTextView = itemView.findViewById(R.id.categoryNameView);
             this.listener = listener;
-            tagCountView = (TextView) itemView.findViewById(R.id.tagCountView);
-            imageCountView = (TextView) itemView.findViewById(R.id.imageCountView);
-            iconImageView = (ImageView) itemView.findViewById(R.id.iconImageView);
-            cardView = (CardView) itemView.findViewById(R.id.singleRow);
-            imageCountImage = (ImageView) itemView.findViewById(R.id.imagecountImage);
-            tagCountImage = (ImageView) itemView.findViewById(R.id.tagCountImage);
+            tagCountView = itemView.findViewById(R.id.tagCountView);
+            imageCountView = itemView.findViewById(R.id.imageCountView);
+            iconImageView = itemView.findViewById(R.id.iconImageView);
+            cardView = itemView.findViewById(R.id.singleRow);
+            imageCountImage = itemView.findViewById(R.id.imagecountImage);
+            tagCountImage = itemView.findViewById(R.id.tagCountImage);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -125,9 +126,9 @@ public class MyViewAdapter extends SelectableAdapter<MyViewAdapter.MyViewHolder>
         }
 
         public interface ClickListener {
-            public void onItemClicked(int position, String category, int imageCount);
+            void onItemClicked(int position, String category, int imageCount);
 
-            public boolean onItemLongClicked(int position);
+            boolean onItemLongClicked(int position);
         }
 
     }
@@ -173,8 +174,8 @@ public class MyViewAdapter extends SelectableAdapter<MyViewAdapter.MyViewHolder>
                     removeRange(positions.get(count - 1), count);
                 }
 
-                for (int i = 0; i < count; ++i) {
-                    positions.remove(0);
+                if (count > 0) {
+                    positions.subList(0, count).clear();
                 }
             }
         }
@@ -186,7 +187,7 @@ public class MyViewAdapter extends SelectableAdapter<MyViewAdapter.MyViewHolder>
             return null;
         }
         Cursor oldCursor = mCursor;
-        this.mCursor = cursor;
+        mCursor = cursor;
         if (cursor != null) {
             this.notifyDataSetChanged();
         }
